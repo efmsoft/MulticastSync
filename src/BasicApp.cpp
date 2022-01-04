@@ -25,10 +25,16 @@ class BasicApp : public App {
 		void draw() override;
 		void setup() override;
 
+		enum NetworkRole_ { 
+			NetworkRole_Master = 0,
+			NetworkRole_Client
+		} role = NetworkRole_::NetworkRole_Master;
+
 	private:
 
 		float value = 0.f;
 		float framerate = 0.f;
+		bool playback = false;
 		
 	protected:
 
@@ -43,6 +49,9 @@ void prepareSettings( BasicApp::Settings* settings ) {
 
 void BasicApp::mouseDrag( MouseEvent event ) {
 
+	if (role != NetworkRole_Master)
+		return;
+
 	// Store the current mouse position in the list.
 	value = event.getPos().x / float(getWindowWidth());
 	value = glm::clamp(value, 0.f, 1.f);
@@ -51,10 +60,13 @@ void BasicApp::mouseDrag( MouseEvent event ) {
 
 void BasicApp::keyDown( KeyEvent event ) {
 
+	if (role != NetworkRole_Master)
+		return;
+
 	if( event.getChar() == 'f' ) {
 
 	} else if( event.getCode() == KeyEvent::KEY_SPACE ) {
-
+		playback = !playback;
 	}
 }
 
@@ -72,6 +84,12 @@ void BasicApp::update() {
 		frameCounter = 0;
 	} else {
 		frameCounter++;
+	}
+
+	if(playback) {
+		value += .001;
+		if (value >= 1.f)
+			value = 0.f;
 	}
 
 }
@@ -98,6 +116,7 @@ void BasicApp::draw() {
 	}
 	
 	gl::drawString("FPS: " + std::to_string(framerate), glm::vec2(50.f));
+	gl::drawString("Value: " + std::to_string(value), glm::vec2(50.f, 100.f), playback ? ci::Color(0.f, 1.f, 0.f) : ci::Color::white());
 
 }
 
