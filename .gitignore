@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+vc2019/.vs/BasicApp/v16/.suo
+vc2019/.vs/
+vc2019/x64/
